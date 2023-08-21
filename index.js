@@ -1,6 +1,9 @@
 const nodemailer = require("nodemailer");
 const cron = require('node-cron');
 const dotenv = require('dotenv');
+const browserObject = require('./browser');
+const scraper = require('./scraper')
+const helpers = require('./helpers')
 dotenv.config();
 
 const transporter = nodemailer.createTransport({
@@ -9,27 +12,45 @@ const transporter = nodemailer.createTransport({
   secure: true,
   auth: {
     user: 'zagorouiko@gmail.com',
-    pass: 'lhoqmbcmpropoyie'
+    pass: process.env.GOOGLE_APP_KEY
   }
 });
 
+let currentPrices
+let previousPrices
+
 async function main() {
 cron.schedule('* * * * *', async () => {
-  const info = await transporter.sendMail({
-    from: '"Blockchain Canary" <foo@example.com>',
-    to: "zagorouiko@gmail.com", 
-    subject: "Hello ✔ - Blockchain Canary",
-    text: "Hello world?", 
-    html: "<b>Hello world?</b>", 
-  });
-  console.log("Message sent: %s", info.messageId);
+
+  //1. read previous price file and set to var
+  if (currentPrices) {
+    previousPrices = currentPrices
+  }
+  
+  //2. scrape new price and set to var
+  let browser = await browserObject.startBrowser();
+  let newPriceObj = await scraper.scraper(browser);
+  currentPrices = newPriceObj
+
+  // Do a check initially to see if previousPrices is undefined - Skip
+  if (!previousPrices) { return }
+  let priceDifference = helpers.priceDifference(previousPrices, currentPrices)
+
+  if (priceDifference.isLargeDifference) {
+    const info = await transporter.sendMail({
+      from: '"Ergo Canary"',
+      to: "zagorouiko@gmail.com", 
+      subject: "Price difference detected!",
+      html: `
+       <b>priceDifference:</b> ${priceDifference.percentageDifference.toFixed(2)}%<br/>
+       <b>rank:</b> ${priceDifference.rank}<br/>
+       <b>address:</b> ${priceDifference.address}<br/>
+       
+       `
+    });
+    console.log("Message sent: %s", info.messageId);
+  }
 });
-
-
-  // NOTE: You can go to https://forwardemail.net/my-account/emails to see your email delivery status and preview
-  //       Or you can use the "preview-email" npm package to preview emails locally in browsers and iOS Simulator
-  //       <https://github.com/forwardemail/preview-email>
-
 }
 
 main().catch(console.error);
