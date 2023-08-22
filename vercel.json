@@ -2,7 +2,7 @@
     "crons": [
       {
         "path": "/index.js",
-        "schedule": "* * * * *"
+        "schedule": "0 0 10 * *"
       }
     ]
   }
