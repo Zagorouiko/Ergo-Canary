@@ -33,8 +33,8 @@ async function main() {
   currentPrices = newPriceObj
 
   // Do a check initially to see if previousPrices is undefined - Skip
-  if (!previousPrices) { return }
-  let priceDifference = helpers.priceDifference(previousPrices, currentPrices)
+  // if (!previousPrices) { return }
+  // let priceDifference = helpers.priceDifference(previousPrices, currentPrices)
 
   await transporter.sendMail({
     from: '"Ergo Canary"',

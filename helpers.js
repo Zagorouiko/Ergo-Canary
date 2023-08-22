@@ -21,4 +21,4 @@ function priceDifference(previousPrices, currentPrices) {
     }
 }
 
-module.exports = { writePricestoFile, priceDifference };
+module.exports = { priceDifference };
