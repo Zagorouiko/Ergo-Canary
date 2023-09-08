@@ -20,7 +20,7 @@ let currentPrices
 let previousPrices
 
 async function main() {
-// cron.schedule('* * * * *', async () => {
+cron.schedule('* * * * *', async () => {
 
   //1. read previous price file and set to var
   if (currentPrices) {
@@ -33,30 +33,30 @@ async function main() {
   currentPrices = newPriceObj
 
   // Do a check initially to see if previousPrices is undefined - Skip
-  // if (!previousPrices) { return }
-  // let priceDifference = helpers.priceDifference(previousPrices, currentPrices)
+  if (!previousPrices) { return }
+  let priceDifference = helpers.priceDifference(previousPrices, currentPrices)
 
-  await transporter.sendMail({
-    from: '"Ergo Canary"',
-    to: "zagorouiko@gmail.com", 
-    subject: "Price difference detected!",
-    html: `TESTING`
-  });
+  // await transporter.sendMail({
+  //   from: '"Ergo Canary"',
+  //   to: "zagorouiko@gmail.com", 
+  //   subject: "Price difference detected!",
+  //   html: `TESTING`
+  // });
 
-  // if (priceDifference.isLargeDifference) {
-  //   const info = await transporter.sendMail({
-  //     from: '"Ergo Canary"',
-  //     to: "zagorouiko@gmail.com", 
-  //     subject: "Price difference detected!",
-  //     html: `
-  //      <b>priceDifference:</b> ${priceDifference.percentageDifference.toFixed(2)}%<br/>
-  //      <b>rank:</b> ${priceDifference.rank}<br/>
-  //      <b>address:</b> ${priceDifference.address}<br/>
+  if (priceDifference.isLargeDifference) {
+    const info = await transporter.sendMail({
+      from: '"Ergo Canary"',
+      to: "zagorouiko@gmail.com", 
+      subject: "Price difference detected!",
+      html: `
+       <b>priceDifference:</b> ${priceDifference.percentageDifference.toFixed(2)}%<br/>
+       <b>rank:</b> ${priceDifference.rank}<br/>
+       <b>address:</b> ${priceDifference.address}<br/>
        
-  //      `
-  //   });
-  // }
-// });
+       `
+    });
+  }
+});
 }
 
 main().catch(console.error);
