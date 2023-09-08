@@ -5,6 +5,8 @@ const browserObject = require('./browser');
 const scraper = require('./scraper')
 const helpers = require('./helpers')
 dotenv.config();
+const express = require('express')
+const app = express()
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
