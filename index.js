@@ -68,5 +68,5 @@ async function main() {
 // });
 }
 
-module.exports = main()
-// main().catch(console.error);
+// module.exports = main()
+main().catch(console.error);
