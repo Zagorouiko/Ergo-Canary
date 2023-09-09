@@ -41,12 +41,9 @@ async function main() {
   
   //2. scrape new price and set to var
   
-  
-  try {
-    browser = await browserObject.startBrowser()
-  } catch (err) {
-    console.log(err)
-  }  
+  console.log("running startBrowser")
+  browser = await browserObject.startBrowser()
+  console.log("running scraper")
   newPriceObj = await scraper.scraper(browser)
   
   currentPrices = newPriceObj
