@@ -7,7 +7,6 @@ const helpers = require('./helpers')
 dotenv.config();
 const express = require('express')
 const app = express()
-const puppeteer = require('puppeteer');
 
 
 const transporter = nodemailer.createTransport({
@@ -30,7 +29,6 @@ app.listen(port, () => {
 let currentPrices
 let previousPrices
 let newPriceObj
-let browser
 
 async function main() {
 
@@ -49,20 +47,24 @@ async function main() {
   if (browser) {
     console.log("running scraper")
     newPriceObj = await scraper.scraper(browser)
+    
+    currentPrices = newPriceObj
+
+    await transporter.sendMail({
+      from: '"Ergo Canary"',
+      to: "zagorouiko@gmail.com", 
+      subject: "Price difference detected!",
+      html: `TESTING`
+    });
   } 
   
-  currentPrices = newPriceObj
+  
 
   // Do a check initially to see if previousPrices is undefined - Skip
   // if (!previousPrices) { return }
   // let priceDifference = helpers.priceDifference(previousPrices, currentPrices)
 
-  await transporter.sendMail({
-    from: '"Ergo Canary"',
-    to: "zagorouiko@gmail.com", 
-    subject: "Price difference detected!",
-    html: `TESTING`
-  });
+
 
   // if (priceDifference.isLargeDifference) {
   //   const info = await transporter.sendMail({
