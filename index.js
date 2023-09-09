@@ -7,7 +7,6 @@ const helpers = require('./helpers')
 dotenv.config();
 const express = require('express')
 const app = express()
-const puppeteer = require('puppeteer');
 
 
 const transporter = nodemailer.createTransport({
@@ -29,6 +28,8 @@ app.listen(port, () => {
 
 let currentPrices
 let previousPrices
+let newPriceObj
+let browser
 
 async function main() {
 // cron.schedule('* * * * *', async () => {
@@ -39,8 +40,15 @@ async function main() {
   }
   
   //2. scrape new price and set to var
-  let browser = await startBrowser();
-  let newPriceObj = await scraper.scraper(browser);
+  
+  
+  try {
+    browser = await browserObject.startBrowser()
+  } catch (err) {
+    console.log(err)
+  }  
+  newPriceObj = await scraper.scraper(browser)
+  
   currentPrices = newPriceObj
 
   // Do a check initially to see if previousPrices is undefined - Skip
@@ -68,17 +76,6 @@ async function main() {
   //   });
   // }
 // });
-}
-
-async function startBrowser(){
-	let browser;
-	try {
-	    console.log("Opening the browser......");
-	    browser = await puppeteer.launch();
-	} catch (err) {
-	    console.log("Could not create a browser instance => : ", err);
-	}
-	return browser;
 }
 
 // module.exports = main()
