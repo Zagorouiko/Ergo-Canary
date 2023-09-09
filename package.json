@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "",
-    "start": "npm install && node index.js"
+    "postinstall": "node node_modules/puppeteer/install.js",
+    "start": "npm install && node node_modules/puppeteer/install.js && node index.js"
   },
   "author": "",
   "license": "ISC",
