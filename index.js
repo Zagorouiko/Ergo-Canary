@@ -7,6 +7,7 @@ const helpers = require('./helpers')
 dotenv.config();
 const express = require('express')
 const app = express()
+const puppeteer = require('puppeteer');
 
 
 const transporter = nodemailer.createTransport({
@@ -32,6 +33,7 @@ let newPriceObj
 let browser
 
 async function main() {
+
 // cron.schedule('* * * * *', async () => {
 
   //1. read previous price file and set to var
@@ -40,11 +42,14 @@ async function main() {
   }
   
   //2. scrape new price and set to var
-  
-  console.log("running startBrowser")
-  browser = await browserObject.startBrowser()
-  console.log("running scraper")
-  newPriceObj = await scraper.scraper(browser)
+
+  const browser = await browserObject.startBrowser()
+
+
+  if (browser) {
+    console.log("running scraper")
+    newPriceObj = await scraper.scraper(browser)
+  } 
   
   currentPrices = newPriceObj
 
@@ -76,4 +81,5 @@ async function main() {
 }
 
 // module.exports = main()
+
 main().catch(console.error);
