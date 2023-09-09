@@ -25,14 +25,13 @@ app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
   });
 
-
 let currentPrices
 let previousPrices
 let newPriceObj
 
 async function main() {
 
-// cron.schedule('* * * * *', async () => {
+cron.schedule('0 0 * * *', async () => {
 
   //1. read previous price file and set to var
   if (currentPrices) {
@@ -40,48 +39,33 @@ async function main() {
   }
   
   //2. scrape new price and set to var
-
   const browser = await browserObject.startBrowser()
-
 
   if (browser) {
     console.log("running scraper")
     newPriceObj = await scraper.scraper(browser)
-    
+
     currentPrices = newPriceObj
 
-    await transporter.sendMail({
-      from: '"Ergo Canary"',
-      to: "zagorouiko@gmail.com", 
-      subject: "Price difference detected!",
-      html: `TESTING`
-    });
+    // Do a check initially to see if previousPrices is undefined - Skip
+    if (!previousPrices) { return }
+    let priceDifference = helpers.priceDifference(previousPrices, currentPrices)
+
+    if (priceDifference.isLargeDifference) {
+      const info = await transporter.sendMail({
+        from: '"Ergo Canary"',
+        to: "zagorouiko@gmail.com", 
+        subject: "Price difference detected!",
+        html: `
+         <b>priceDifference:</b> ${priceDifference.percentageDifference.toFixed(2)}%<br/>
+         <b>rank:</b> ${priceDifference.rank}<br/>
+         <b>address:</b> ${priceDifference.address}<br/>     
+         `
+      });
+    }
   } 
-  
-  
-
-  // Do a check initially to see if previousPrices is undefined - Skip
-  // if (!previousPrices) { return }
-  // let priceDifference = helpers.priceDifference(previousPrices, currentPrices)
-
-
-
-  // if (priceDifference.isLargeDifference) {
-  //   const info = await transporter.sendMail({
-  //     from: '"Ergo Canary"',
-  //     to: "zagorouiko@gmail.com", 
-  //     subject: "Price difference detected!",
-  //     html: `
-  //      <b>priceDifference:</b> ${priceDifference.percentageDifference.toFixed(2)}%<br/>
-  //      <b>rank:</b> ${priceDifference.rank}<br/>
-  //      <b>address:</b> ${priceDifference.address}<br/>
-       
-  //      `
-  //   });
-  // }
-// });
+});
 }
 
-// module.exports = main()
 
 main().catch(console.error);
